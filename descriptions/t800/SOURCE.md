@@ -9,6 +9,11 @@ commit 335c60e88772c26c7852d0abd6b3c7439037dd8f
 assets/resource/robot/t800/xml/serial_links.xml
 ```
 
+The visual OBJ meshes under `descriptions/engineai_t800/meshes/` come from
+the same pinned SDK revision.  Only the torso and five right-arm meshes needed
+by the fixed MCC harness are tracked here; the vendor's complete floating-base
+model is intentionally not loaded by this harness.
+
 The model is deliberately fixed at the T800 torso and contains only joints
 J18--J22. It is an MCC estimator/IK harness, not a replacement whole-body T800
 simulator. The `right_hand_contact` position currently uses the center of the
