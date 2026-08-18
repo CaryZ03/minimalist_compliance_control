@@ -1,0 +1,3 @@
+robot:
+  model: t800
+  controlled_limb: right_arm

@@ -56,7 +56,7 @@ def _build_sim(
     if args.sim == "mujoco":
         model = mujoco.MjModel.from_xml_path(xml_path)
         data = mujoco.MjData(model)
-        if args.robot in {"arx", "g1"}:
+        if args.robot in {"arx", "g1", "t800"}:
             custom_pd = False
         else:
             custom_pd = True
@@ -78,6 +78,14 @@ def _build_sim(
                 control_dt=control_dt,
                 xml_path=str(xml_path),
                 net_if=str(getattr(args, "ip", "")),
+            )
+        if str(args.robot).strip().lower() == "t800":
+            from real_world.real_world_t800 import RealWorldT800
+
+            return RealWorldT800(
+                control_dt=control_dt,
+                xml_path=str(xml_path),
+                mode=str(getattr(args, "t800_real_mode", "shadow")),
             )
         if str(args.robot).strip().lower() == "arx":
             from real_world.real_world_arx import RealWorldARX
@@ -281,7 +289,10 @@ def run_policy(sim: Any, robot: str, policy: Any) -> None:
 def _parse_args(args: Sequence[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Unified policy runner")
     parser.add_argument(
-        "--robot", type=str, required=True, choices=["toddlerbot", "leap", "arx", "g1"]
+        "--robot",
+        type=str,
+        required=True,
+        choices=["toddlerbot", "leap", "arx", "g1", "t800"],
     )
     parser.add_argument("--sim", type=str, default="mujoco", choices=["mujoco", "real"])
     parser.add_argument(
@@ -303,6 +314,17 @@ def _parse_args(args: Sequence[str] | None = None) -> argparse.Namespace:
         type=str,
         default="en9",
         help="Network interface for real robots (e.g., en0/eth0).",
+    )
+    parser.add_argument(
+        "--t800-real-mode",
+        type=str,
+        default="shadow",
+        choices=["readonly", "shadow", "zero_replay", "command"],
+        help=(
+            "T800 real-hardware output mode. readonly/shadow never create a "
+            "command publisher; zero_replay publishes measured arm positions; "
+            "command publishes bounded MCC targets."
+        ),
     )
     parser.add_argument("--ckpt", type=str, default="")
     parser.add_argument("--object", type=str, default="black ink. whiteboard. vase")

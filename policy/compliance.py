@@ -45,6 +45,10 @@ class ComplianceConfig:
     ref_motor_pos: Sequence[float] = ()
     use_compliance: bool = True
     perturb_force_max: float = 3.0
+    prep_duration_sim: float = 2.0
+    prep_duration_real: float = 7.0
+    prep_hold_sim: float = 0.0
+    prep_hold_real: float = 5.0
 
 
 class CompliancePolicy:
@@ -79,6 +83,8 @@ class CompliancePolicy:
                 selected_config_name = "g1.gin"
             elif self.robot == "arx":
                 selected_config_name = "arx.gin"
+            elif self.robot == "t800":
+                selected_config_name = "t800.gin"
             else:
                 selected_config_name = "toddlerbot.gin"
 
@@ -501,14 +507,30 @@ class CompliancePolicy:
 
         if not self.is_prepared:
             self.is_prepared = True
-            self.prep_duration = 2.0 if has_mujoco_state else 7.0
+            self.prep_duration = (
+                float(self.compliance_cfg.prep_duration_sim)
+                if has_mujoco_state
+                else float(self.compliance_cfg.prep_duration_real)
+            )
+            prep_hold = (
+                float(self.compliance_cfg.prep_hold_sim)
+                if has_mujoco_state
+                else float(self.compliance_cfg.prep_hold_real)
+            )
+            if self.prep_duration <= 0.0:
+                raise ValueError("Compliance preparation duration must be > 0.")
+            if prep_hold < 0.0 or prep_hold >= self.prep_duration:
+                raise ValueError(
+                    "Compliance preparation hold must be >= 0 and less than "
+                    "the corresponding preparation duration."
+                )
             self.prep_time, self.prep_action = get_action_traj(
                 0.0,
                 self.init_motor_pos,
                 self.ref_motor_pos,
                 self.prep_duration,
                 self.control_dt,
-                end_time=0.0 if has_mujoco_state else 5.0,
+                end_time=prep_hold,
             )
         if float(obs.time) < float(self.prep_duration):
             return np.asarray(

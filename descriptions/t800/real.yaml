@@ -1,0 +1,24 @@
+joint_indices: [18, 19, 20, 21, 22]
+joint_names:
+  - J18_SHOULDER_PITCH_R
+  - J19_SHOULDER_ROLL_R
+  - J20_SHOULDER_YAW_R
+  - J21_ELBOW_PITCH_R
+  - J22_ELBOW_YAW_R
+
+motion: extand_right_hand
+target_positions: [-0.47, 0.255, 0.161, -0.731, 0.0]
+use_gravity_compensation: true
+duration: 2.0
+settle_duration: 2.0
+stiffness: [40.0, 40.0, 20.0, 40.0, 20.0]
+damping: [1.0, 1.0, 1.0, 1.0, 1.0]
+
+required_motion_state: lower_body_balance
+publish_frequency: 100.0
+max_state_age: 0.05
+max_joint_delta_per_publish: 0.01
+max_joint_velocity: 0.5
+baseline_duration: 2.0
+baseline_velocity_threshold: 0.03
+weight: 1.0

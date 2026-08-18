@@ -1,0 +1,61 @@
+<mujoco model="engineai_t800_right_arm_fixed">
+  <compiler angle="radian" autolimits="true"/>
+  <!-- The vendor motion plan enables gravity compensation.  This fixed-arm
+       harness models that ideal compensation by removing gravity; external
+       forces are still injected through mj_applyFT. -->
+  <option timestep="0.002" integrator="implicitfast" gravity="0 0 0"/>
+
+  <default>
+    <joint damping="1.0" frictionloss="0.0"/>
+    <geom contype="0" conaffinity="0" rgba="0.35 0.55 0.85 1"/>
+  </default>
+
+  <worldbody>
+    <light pos="0 -1 2"/>
+    <body name="LINK_WAIST_YAW" pos="0 0 1.0">
+      <geom type="box" size="0.09 0.10 0.18" pos="0 0 0.18" rgba="0.25 0.25 0.3 1"/>
+      <body name="LINK_SHOULDER_PITCH_R" pos="-0.011 -0.16303 0.27889">
+        <inertial pos="-0.00615457 -0.0528418 -0.0124871" quat="0.547699 0.835175 -0.0410699 -0.0286813" mass="1.76883" diaginertia="0.00240978 0.00213951 0.00130718"/>
+        <joint name="J18_SHOULDER_PITCH_R" axis="0 0.996779 -0.0801989" range="-2.967 2.793" armature="0.0354625"/>
+        <geom type="capsule" fromto="0 0 0 0 -0.062533 -0.015455" size="0.045"/>
+        <body name="LINK_SHOULDER_ROLL_R" pos="0 -0.062533 -0.015455">
+          <inertial pos="-0.00557192 -0.00446659 -0.0271293" quat="0.680468 -0.196856 -0.0958375 0.699304" mass="0.682893" diaginertia="0.00216819 0.00159945 0.0014132"/>
+          <joint name="J19_SHOULDER_ROLL_R" axis="1 0 0" range="-2.443 0.384" armature="0.0354625"/>
+          <geom type="capsule" fromto="0 0 0 0 -0.0085246 -0.082712" size="0.04"/>
+          <body name="LINK_SHOULDER_YAW_R" pos="0.000034602 -0.0085246 -0.082712">
+            <inertial pos="0.00062214 -0.00554981 -0.0898056" quat="0.7072 -0.024757 0.0160146 0.706399" mass="2.55202" diaginertia="0.00997961 0.00983419 0.00114425"/>
+            <joint name="J20_SHOULDER_YAW_R" axis="0 0.0714971 0.997441" range="-2.618 2.618" armature="0.0354625"/>
+            <geom type="capsule" fromto="0 0 0 0.0019252 -0.013597 -0.15075" size="0.042"/>
+            <body name="LINK_ELBOW_PITCH_R" pos="0.0019252 -0.013597 -0.15075">
+              <inertial pos="-0.00883497 -0.00295203 -0.0733334" quat="0.992911 -0.0869004 0.0117583 -0.0802349" mass="1.19527" diaginertia="0.00319667 0.00310646 0.00126793"/>
+              <joint name="J21_ELBOW_PITCH_R" axis="0 0.997441 -0.0714971" range="-2.286 0.262" armature="0.0354625"/>
+              <geom type="capsule" fromto="0 0 0 -0.0022091 -0.0094362 -0.13182" size="0.038"/>
+              <body name="LINK_ELBOW_YAW_R" pos="-0.0022091 -0.0094362 -0.13182">
+                <inertial pos="0.0130094 -0.00447975 -0.0584384" quat="0.702216 -0.106593 -0.0450935 0.702494" mass="1.07882" diaginertia="0.00215017 0.00201667 0.000854073"/>
+                <joint name="J22_ELBOW_YAW_R" axis="-0.216439 0.0698028 0.973797" range="-2.618 2.618" armature="0.00671625"/>
+                <geom type="capsule" fromto="0 0 0 0.029436 -0.0124855 -0.13222151" size="0.035"/>
+                <body name="LINK_WRIST_END_R" pos="0.029436 -0.0124855 -0.13222151">
+                  <inertial pos="0 0 0" mass="0.001" diaginertia="1e-8 1e-8 1e-8"/>
+                  <geom type="sphere" pos="0.026 0.009 -0.06" size="0.05" rgba="0.85 0.55 0.2 1"/>
+                  <site name="right_hand_contact" pos="0.026 0.009 -0.06" size="0.015" rgba="1 0.1 0.1 1"/>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <position name="motor_J18_SHOULDER_PITCH_R" joint="J18_SHOULDER_PITCH_R" kp="40" forcerange="-160 160"/>
+    <position name="motor_J19_SHOULDER_ROLL_R" joint="J19_SHOULDER_ROLL_R" kp="40" forcerange="-160 160"/>
+    <position name="motor_J20_SHOULDER_YAW_R" joint="J20_SHOULDER_YAW_R" kp="20" forcerange="-160 160"/>
+    <position name="motor_J21_ELBOW_PITCH_R" joint="J21_ELBOW_PITCH_R" kp="40" forcerange="-160 160"/>
+    <position name="motor_J22_ELBOW_YAW_R" joint="J22_ELBOW_YAW_R" kp="20" forcerange="-52 52"/>
+  </actuator>
+
+  <keyframe>
+    <key name="extand_right_hand" qpos="-0.47 0.255 0.161 -0.731 0.0" ctrl="-0.47 0.255 0.161 -0.731 0.0"/>
+  </keyframe>
+</mujoco>

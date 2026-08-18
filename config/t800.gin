@@ -1,0 +1,69 @@
+# EngineAI base T800 fixed-base, right-arm-only compliance configuration.
+# The preparation target mirrors the vendor motion plan `extand_right_hand`.
+
+WrenchSimConfig.xml_path = "descriptions/t800/right_arm_fixed.xml"
+WrenchSimConfig.site_names = ("right_hand_contact",)
+WrenchSimConfig.fixed_base = True
+WrenchSimConfig.view = True
+WrenchSimConfig.render = False
+
+ControllerConfig.xml_path = "descriptions/t800/right_arm_fixed.xml"
+ControllerConfig.site_names = ("right_hand_contact",)
+ControllerConfig.fixed_base = True
+ControllerConfig.joint_names_by_site = {
+    "right_hand_contact": (
+        "J18_SHOULDER_PITCH_R",
+        "J19_SHOULDER_ROLL_R",
+        "J20_SHOULDER_YAW_R",
+        "J21_ELBOW_PITCH_R",
+        "J22_ELBOW_YAW_R",
+    ),
+}
+ControllerConfig.motor_names_by_site = {
+    "right_hand_contact": (
+        "motor_J18_SHOULDER_PITCH_R",
+        "motor_J19_SHOULDER_ROLL_R",
+        "motor_J20_SHOULDER_YAW_R",
+        "motor_J21_ELBOW_PITCH_R",
+        "motor_J22_ELBOW_YAW_R",
+    ),
+}
+ControllerConfig.gear_ratios_by_site = {
+    "right_hand_contact": (1, 1, 1, 1, 1),
+}
+ControllerConfig.base_body_name = ""
+ControllerConfig.motor_torque_ema_alpha = 0.1
+
+WrenchEstimateConfig.force_reg = 1e-3
+WrenchEstimateConfig.torque_reg = 1e-2
+WrenchEstimateConfig.force_only = True
+WrenchEstimateConfig.axis_aligned = True
+WrenchEstimateConfig.normal_axis = "+z"
+
+RefConfig.dt = 0.02
+RefConfig.mass = 1.0
+RefConfig.inertia_diag = (1.0, 1.0, 1.0)
+RefConfig.fixed_model_xml_path = "descriptions/t800/right_arm_fixed.xml"
+RefConfig.default_motor_pos = (-0.47, 0.255, 0.161, -0.731, 0.0)
+RefConfig.default_qpos = (-0.47, 0.255, 0.161, -0.731, 0.0)
+RefConfig.joint_to_actuator_scale = (1, 1, 1, 1, 1)
+RefConfig.joint_to_actuator_bias = (0, 0, 0, 0, 0)
+
+IKConfig.ik_position_only = True
+IKConfig.mink_num_iter = 2
+IKConfig.mink_damping = 0.1
+IKConfig.avoid_self_collision = False
+
+ComplianceConfig.kp_pos = 40.0
+ComplianceConfig.kp_rot = 0.0
+ComplianceConfig.use_compliance = True
+ComplianceConfig.perturb_force_max = 2.0
+# Two seconds of motion, followed by two seconds of settle/zero-force hold.
+ComplianceConfig.prep_duration_sim = 4.0
+ComplianceConfig.prep_duration_real = 4.0
+ComplianceConfig.prep_hold_sim = 2.0
+ComplianceConfig.prep_hold_real = 2.0
+
+MotorConfigPaths.default_config_path = "descriptions/default.yml"
+MotorConfigPaths.robot_config_path = "descriptions/t800/robot.yml"
+MotorConfigPaths.motor_config_path = None
