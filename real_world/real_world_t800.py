@@ -17,6 +17,12 @@ import numpy as np
 import rclpy
 import yaml
 from rclpy.executors import SingleThreadedExecutor
+from rclpy.qos import (
+    DurabilityPolicy,
+    HistoryPolicy,
+    QoSProfile,
+    ReliabilityPolicy,
+)
 from scipy.spatial.transform import Rotation as R
 from std_msgs.msg import Header
 
@@ -99,17 +105,23 @@ class RealWorldT800:
             self._owns_rclpy = False
 
         self.node = rclpy.create_node("mcc_t800_right_arm")
+        state_qos = QoSProfile(
+            history=HistoryPolicy.KEEP_LAST,
+            depth=10,
+            reliability=ReliabilityPolicy.BEST_EFFORT,
+            durability=DurabilityPolicy.VOLATILE,
+        )
         self.joint_state_sub = self.node.create_subscription(
             JointState,
             "/hardware/joint_state",
             self._joint_state_callback,
-            10,
+            state_qos,
         )
         self.motion_state_sub = self.node.create_subscription(
             MotionState,
             "/motion/motion_state",
             self._motion_state_callback,
-            10,
+            state_qos,
         )
 
         self.command_pub = None
@@ -215,6 +227,8 @@ class RealWorldT800:
     def get_observation(self, retries: int = 0) -> Obs:
         deadline = None if int(retries) < 0 else time.monotonic() + 3.0
         while True:
+            if self._closed or not rclpy.ok():
+                raise RuntimeError("T800 ROS 2 backend is shutting down.")
             try:
                 q, dq, tau, rx_time, _ = self._arm_snapshot()
                 break

@@ -1,0 +1,15 @@
+absl-py==2.5.0
+daqp==0.9.1
+etils[epath]==1.13.0
+fsspec==2026.7.0
+gin-config==0.5.0
+glfw==2.10.2
+importlib-resources==7.1.0
+mink==0.0.13
+mujoco==3.11.0
+numpy==2.2.6
+PyOpenGL==3.1.10
+qpsolvers==4.13.0
+scipy==1.15.3
+typing-extensions==4.16.0
+zipp==4.1.0

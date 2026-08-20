@@ -8,7 +8,6 @@ from dataclasses import dataclass
 from typing import Any, Dict, Optional, Sequence
 
 import gin
-import joblib
 import numpy as np
 import numpy.typing as npt
 
@@ -577,6 +576,8 @@ class CompliancePolicy:
     def save_compliance_ref_log(self, exp_folder_path: str) -> None:
         if not exp_folder_path:
             return
+        import joblib
+
         os.makedirs(exp_folder_path, exist_ok=True)
         payload = {
             "time": np.asarray(self.compliance_time_log, dtype=np.float32),
