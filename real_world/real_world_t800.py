@@ -311,20 +311,10 @@ class RealWorldT800:
         abs_velocity = np.abs(dq)
         max_velocity_index = int(np.argmax(abs_velocity))
         max_velocity = float(abs_velocity[max_velocity_index])
-        if max_velocity > self.max_joint_velocity:
-            if not self._output_armed:
+        if not self._output_armed:
+            if max_velocity > self.baseline_velocity_threshold:
                 self._output_safe_since = 0.0
                 return
-            joint_index = int(self.joint_indices[max_velocity_index])
-            self._fault_reason = (
-                "T800 right-arm velocity safety limit exceeded: "
-                f"J{joint_index:02d}={float(dq[max_velocity_index]):.4f} rad/s, "
-                f"limit={self.max_joint_velocity:.4f}, "
-                f"arm_velocity={np.array2string(dq, precision=4)}"
-            )
-            return
-
-        if not self._output_armed:
             if self._output_safe_since <= 0.0:
                 self._output_safe_since = now
                 return
@@ -333,8 +323,19 @@ class RealWorldT800:
             self._output_armed = True
             self.node.get_logger().info(
                 "T800 output armed after "
-                f"{self.output_arm_duration:.2f}s of stable right-arm velocity"
+                f"{self.output_arm_duration:.2f}s below "
+                f"{self.baseline_velocity_threshold:.4f} rad/s"
             )
+
+        if max_velocity > self.max_joint_velocity:
+            joint_index = int(self.joint_indices[max_velocity_index])
+            self._fault_reason = (
+                "T800 right-arm velocity safety limit exceeded: "
+                f"J{joint_index:02d}={float(dq[max_velocity_index]):.4f} rad/s, "
+                f"limit={self.max_joint_velocity:.4f}, "
+                f"arm_velocity={np.array2string(dq, precision=4)}"
+            )
+            return
 
         if self.mode == "zero_replay":
             requested = q.astype(np.float64)
