@@ -19,6 +19,7 @@ publish_frequency: 100.0
 max_state_age: 0.05
 max_joint_delta_per_publish: 0.01
 max_joint_velocity: 0.5
+output_arm_duration: 1.0
 baseline_duration: 2.0
 baseline_velocity_threshold: 0.03
 weight: 1.0
