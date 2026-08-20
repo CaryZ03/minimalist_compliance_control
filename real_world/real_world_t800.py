@@ -105,32 +105,44 @@ class RealWorldT800:
             self._owns_rclpy = False
 
         self.node = rclpy.create_node("mcc_t800_right_arm")
-        state_qos = QoSProfile(
+        joint_state_qos = QoSProfile(
             history=HistoryPolicy.KEEP_LAST,
             depth=10,
             reliability=ReliabilityPolicy.BEST_EFFORT,
+            durability=DurabilityPolicy.VOLATILE,
+        )
+        motion_state_qos = QoSProfile(
+            history=HistoryPolicy.KEEP_LAST,
+            depth=10,
+            reliability=ReliabilityPolicy.RELIABLE,
             durability=DurabilityPolicy.VOLATILE,
         )
         self.joint_state_sub = self.node.create_subscription(
             JointState,
             "/hardware/joint_state",
             self._joint_state_callback,
-            state_qos,
+            joint_state_qos,
         )
         self.motion_state_sub = self.node.create_subscription(
             MotionState,
             "/motion/motion_state",
             self._motion_state_callback,
-            state_qos,
+            motion_state_qos,
         )
 
         self.command_pub = None
         self.publish_timer = None
         if self.mode in {"zero_replay", "command"}:
+            command_qos = QoSProfile(
+                history=HistoryPolicy.KEEP_LAST,
+                depth=1,
+                reliability=ReliabilityPolicy.BEST_EFFORT,
+                durability=DurabilityPolicy.VOLATILE,
+            )
             self.command_pub = self.node.create_publisher(
                 JointOverrideCommand,
                 "/motion/joint_override_command",
-                10,
+                command_qos,
             )
             self.publish_timer = self.node.create_timer(
                 1.0 / self.publish_frequency,
@@ -275,6 +287,11 @@ class RealWorldT800:
         try:
             q, dq, _, rx_time, motion_state = self._arm_snapshot()
         except RuntimeError:
+            return
+        # Joint state commonly arrives before the first motion-state sample.
+        # Stay silent until the safety state is initialized instead of turning
+        # this normal startup race into a sticky fault.
+        if not motion_state:
             return
         now = time.monotonic()
         if now - rx_time > self.max_state_age:
