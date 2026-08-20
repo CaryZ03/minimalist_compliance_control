@@ -68,39 +68,6 @@ real-world performance is often better than in simulation.
 
 ## Real-World Setup
 
-### T800 direct DDS connection
-
-When MCC runs in `engineai-workspace`, select exactly one T800 robot and install
-temporary host routes to its Orin (`192.168.0.162`) and Nezha
-(`192.168.0.163`):
-
-```bash
-python scripts/t800_dds_connect.py --dry-run connect t800e
-python scripts/t800_dds_connect.py connect t800e
-source ~/.config/t800-dds/active.env
-python scripts/t800_dds_connect.py probe
-```
-
-Switching to another robot replaces the active routes:
-
-```bash
-python scripts/t800_dds_connect.py connect t800a
-python scripts/t800_dds_connect.py status
-python scripts/t800_dds_connect.py disconnect
-```
-
-The script expects SSH aliases `t800a` through `t800e` and
-`t800a-nezha` through `t800e-nezha`. It connects back to the GPU server as
-`zhangkairui@10.249.86.100:2222` by default; all values can be overridden with
-the command-line options shown by `--help`. SSH and sudo passwords are entered
-interactively and are never stored. Use `--configure-forwarding` only if the
-selected Orin reports that IPv4 forwarding is disabled.
-
-The routes are intentionally transient and only one T800 can be active because
-all five robots reuse the same internal addresses. The script does not change
-firewall rules. `probe` additionally checks that the T800 joint-state,
-motion-state, and joint-override-command topics are visible in ROS domain 69.
-
 For ARX, install the external ARX5 SDK: https://github.com/real-stanford/arx5-sdk.
 If you cannot find the CAN interface, try `sudo ip link set up can0 type can bitrate 1000000`.
 Example ARX real-run environment:
